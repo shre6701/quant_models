@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEGIS // Forensic Equity Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090D;
+  --panel:#0D1117;
+  --panel-2:#10161F;
+  --line:#1C2430;
+  --line-bright:#2A3546;
+  --amber:#F5A623;
+  --amber-dim:#8A6217;
+  --red:#FF4D4D;
+  --red-dim:#5C2424;
+  --teal:#2FD6A3;
+  --teal-dim:#14483A;
+  --blue:#4D9FFF;
+  --ink:#E8ECF4;
+  --ink-mid:#9AA5B8;
+  --ink-dim:#5C6982;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --disp:'Saira Condensed',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;
+  background-image:
+    linear-gradient(rgba(28,36,48,.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28,36,48,.18) 1px, transparent 1px);
+  background-size:48px 48px;
+}
+::selection{background:var(--amber);color:#000;}
+button{font-family:inherit;cursor:pointer;}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px 80px;}
+
+/* ── command bar ─────────────────────────── */
+.cmdbar{position:sticky;top:0;z-index:50;background:rgba(7,9,13,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);}
+.cmdbar-in{max-width:1280px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.brand{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:.06em;color:var(--ink);display:flex;align-items:center;gap:10px;}
+.brand .mark{width:26px;height:26px;border:2px solid var(--amber);position:relative;flex:none;}
+.brand .mark::after{content:"";position:absolute;inset:5px;background:var(--amber);
+  clip-path:polygon(0 100%,50% 0,100% 100%);}
+.brand small{font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.18em;color:var(--ink-dim);display:block;}
+.cmd-meta{margin-left:auto;display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:11px;color:var(--ink-dim);}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);
+  box-shadow:0 0 8px var(--amber);animation:pulse 2s infinite;vertical-align:1px;margin-right:6px;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.badge-demo{border:1px solid var(--amber-dim);color:var(--amber);padding:2px 8px;font-size:10px;letter-spacing:.14em;}
+
+/* ── ticker deck ─────────────────────────── */
+.deck{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch;margin:26px 0 0;}
+.tick{flex:1 1 220px;background:var(--panel);border:1px solid var(--line);padding:14px 16px;text-align:left;
+  color:var(--ink);transition:border-color .15s, transform .15s;position:relative;}
+.tick:hover{border-color:var(--line-bright);}
+.tick:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+.tick.sel{border-color:var(--amber);}
+.tick.sel::before{content:"TARGET LOCKED";position:absolute;top:-1px;right:-1px;background:var(--amber);
+  color:#000;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.12em;padding:2px 7px;}
+.tick .sym{font-family:var(--mono);font-weight:600;font-size:18px;color:var(--amber);}
+.tick .nm{font-size:12px;color:var(--ink-mid);}
+.tick .sec{font-family:var(--mono);font-size:10px;color:var(--ink-dim);letter-spacing:.1em;margin-top:6px;}
+.runbtn{flex:1 1 200px;background:var(--amber);border:1px solid var(--amber);color:#000;
+  font-family:var(--disp);font-weight:700;font-size:19px;letter-spacing:.08em;display:flex;align-items:center;justify-content:center;gap:10px;min-height:78px;
+  transition:filter .15s;}
+.runbtn:hover{filter:brightness(1.12);}
+.runbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+.runbtn[disabled]{opacity:.45;cursor:wait;}
+
+/* ── scan console ───────────────────────── */
+.console{display:none;margin-top:14px;background:#05070A;border:1px solid var(--line);padding:14px 16px;
+  font-family:var(--mono);font-size:12px;min-height:150px;max-height:260px;overflow-y:auto;position:relative;}
+.console.on{display:block;}
+.console::after{content:"";position:absolute;left:0;right:0;height:34px;top:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(245,166,35,.06),transparent);animation:scanline 1.4s linear infinite;}
+.console.done::after{display:none;}
+@keyframes scanline{from{transform:translateY(0)}to{transform:translateY(200px)}}
+.cl{display:block;white-space:pre-wrap;color:var(--ink-mid);animation:clin .2s ease-out;}
+@keyframes clin{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:none}}
+.cl b{font-weight:600;}
+.cl .ok{color:var(--teal);} .cl .warn{color:var(--amber);} .cl .fail{color:var(--red);} .cl .sys{color:var(--ink-dim);}
+
+/* ── verdict block ──────────────────────── */
+.verdict{display:none;margin-top:26px;scroll-margin-top:74px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel-2),var(--panel));
+  padding:26px;gap:30px;grid-template-columns:280px 1fr;align-items:center;}
+.verdict.on{display:grid;}
+.dialwrap{text-align:center;}
+.dial{width:240px;height:240px;margin:0 auto;display:block;}
+.dial .track{stroke:var(--line);}
+.dial .fill{stroke:var(--amber);stroke-linecap:butt;transition:stroke-dashoffset 1.6s cubic-bezier(.2,.8,.2,1), stroke .4s;}
+.dial-num{font-family:var(--disp);font-weight:700;font-size:64px;fill:var(--ink);}
+.dial-lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;fill:var(--ink-dim);}
+.v-band{font-family:var(--mono);font-size:11px;letter-spacing:.18em;padding:4px 12px;border:1px solid;display:inline-block;margin-top:10px;}
+.v-head{font-family:var(--disp);font-weight:700;font-size:30px;letter-spacing:.03em;line-height:1.1;}
+.v-sub{font-family:var(--mono);font-size:11px;color:var(--ink-dim);letter-spacing:.14em;margin-bottom:12px;}
+.v-text{color:var(--ink-mid);font-size:14.5px;max-width:62ch;}
+.v-text strong{color:var(--ink);}
+.flagrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.flag{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;padding:4px 10px;border:1px solid;}
+.flag.r{color:var(--red);border-color:var(--red-dim);background:rgba(255,77,77,.06);}
+.flag.a{color:var(--amber);border-color:var(--amber-dim);background:rgba(245,166,35,.06);}
+.flag.g{color:var(--teal);border-color:var(--teal-dim);background:rgba(47,214,163,.05);}
+
+/* ── layer grid ─────────────────────────── */
+.layers{display:none;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;margin-top:14px;}
+.layers.on{display:grid;}
+.card{background:var(--panel);border:1px solid var(--line);opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s,border-color .15s;}
+.card.in{opacity:1;transform:none;}
+.card:hover{border-color:var(--line-bright);}
+.card-h{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);}
+.card-h .ttl{font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:.05em;}
+.card-h .wt{font-family:var(--mono);font-size:10px;color:var(--ink-dim);letter-spacing:.1em;}
+.lscore{margin-left:auto;font-family:var(--mono);font-weight:600;font-size:15px;}
+.lbar{height:3px;background:var(--line);}
+.lbar i{display:block;height:100%;width:0;transition:width 1.2s cubic-bezier(.2,.8,.2,1);}
+.metric{border-bottom:1px solid var(--line);}
+.metric:last-child{border-bottom:none;}
+.m-row{width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;color:var(--ink);
+  padding:10px 16px;text-align:left;font-size:13px;}
+.m-row:focus-visible{outline:2px solid var(--amber);outline-offset:-2px;}
+.m-dot{width:8px;height:8px;flex:none;border-radius:50%;}
+.m-dot.g{background:var(--teal);} .m-dot.a{background:var(--amber);} .m-dot.r{background:var(--red);box-shadow:0 0 6px rgba(255,77,77,.6);}
+.m-name{color:var(--ink-mid);}
+.m-val{margin-left:auto;font-family:var(--mono);font-size:12.5px;white-space:nowrap;}
+.m-car{color:var(--ink-dim);font-size:10px;transition:transform .2s;flex:none;}
+.metric.open .m-car{transform:rotate(90deg);}
+.m-why{display:none;padding:0 16px 12px 34px;color:var(--ink-dim);font-size:12.5px;line-height:1.55;}
+.m-why em{color:var(--amber);font-style:normal;}
+.metric.open .m-why{display:block;}
+.spark{display:block;margin:4px 16px 12px 34px;}
+
+/* ── snapshot card ──────────────────────── */
+.snapwrap{display:none;margin-top:30px;}
+.snapwrap.on{display:block;}
+.sec-h{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--ink-dim);margin:30px 0 10px;display:flex;align-items:center;gap:12px;}
+.sec-h::after{content:"";flex:1;height:1px;background:var(--line);}
+.snap{border:1px solid var(--amber-dim);background:
+  radial-gradient(600px 300px at 80% -20%,rgba(245,166,35,.10),transparent),var(--panel);
+  padding:30px;max-width:680px;}
+.snap .s-top{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ink-dim);margin-bottom:18px;}
+.snap .s-sym{font-family:var(--disp);font-weight:700;font-size:44px;line-height:1;}
+.snap .s-nm{color:var(--ink-mid);font-size:13px;margin-top:2px;}
+.snap .s-score{font-family:var(--disp);font-weight:700;font-size:84px;line-height:.9;}
+.snap .s-grid{display:flex;justify-content:space-between;align-items:flex-end;margin:14px 0 20px;gap:20px;flex-wrap:wrap;}
+.snap .s-flags{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:11.5px;}
+.snap .s-flags span::before{content:"▸ ";color:var(--amber);}
+.snap .s-foot{border-top:1px solid var(--line);padding-top:12px;margin-top:18px;font-family:var(--mono);font-size:10px;color:var(--ink-dim);letter-spacing:.1em;display:flex;justify-content:space-between;}
+
+.disc{margin-top:26px;font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);line-height:1.7;border-top:1px solid var(--line);padding-top:14px;max-width:90ch;}
+
+@media (max-width:820px){
+  .verdict.on{grid-template-columns:1fr;text-align:center;}
+  .v-text{margin:0 auto;}
+  .flagrow{justify-content:center;}
+  .brand{font-size:18px;}
+  .cmd-meta{display:none;}
+  .snap{padding:20px;}
+  .snap .s-score{font-size:64px;}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;}
+}
+</style>
+</head>
+<body>
+
+<header class="cmdbar">
+  <div class="cmdbar-in">
+    <div class="brand"><span class="mark"></span><span>AEGIS<small>FORENSIC EQUITY TERMINAL · v2.4</small></span></div>
+    <div class="cmd-meta">
+      <span><span class="live-dot"></span><span id="clock">--:--:--</span> UTC</span>
+      <span>SESSION 0x4F2A</span>
+      <span class="badge-demo">DEMO DATASET</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="sec-h" style="margin-top:28px">SELECT TARGET // RUN 8-LAYER DEEP SCAN</div>
+  <div class="deck" id="deck"></div>
+
+  <div class="console" id="console" role="log" aria-live="polite"></div>
+
+  <section class="verdict" id="verdict" aria-label="Composite verdict">
+    <div class="dialwrap">
+      <svg class="dial" viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="track" cx="100" cy="100" r="84" fill="none" stroke-width="10"
+          stroke-dasharray="395.8 131.9" transform="rotate(135 100 100)"/>
+        <circle class="fill" id="dialFill" cx="100" cy="100" r="84" fill="none" stroke-width="10"
+          stroke-dasharray="395.8 527.8" stroke-dashoffset="395.8" transform="rotate(135 100 100)"/>
+        <text class="dial-num" id="dialNum" x="100" y="110" text-anchor="middle">0</text>
+        <text class="dial-lab" x="100" y="134" text-anchor="middle">AEGIS INTEGRITY SCORE</text>
+        <text class="dial-lab" x="100" y="186" text-anchor="middle">0 = SEVERE · 100 = CLEAN</text>
+      </svg>
+      <span class="v-band" id="vBand"></span>
+    </div>
+    <div>
+      <div class="v-sub" id="vSub"></div>
+      <h2 class="v-head" id="vHead"></h2>
+      <p class="v-text" id="vText" style="margin-top:10px"></p>
+      <div class="flagrow" id="vFlags"></div>
+    </div>
+  </section>
+
+  <div class="layers" id="layers"></div>
+
+  <div class="snapwrap" id="snapwrap">
+    <div class="sec-h">SHARE SNAPSHOT // SCREENSHOT-READY</div>
+    <div class="snap" id="snap"></div>
+  </div>
+
+  <p class="disc">AEGIS DEMO BUILD — All three issuers are fictional archetypes. Financials are illustrative; model formulas (Beneish M-Score, Altman Z-Score, Piotroski F-Score, Sloan accruals) are computed live in your browser from the embedded statements. Nothing here is investment advice, and no output should be read as an accusation against any real company. Production deployments connect to SEC EDGAR/XBRL, Form 4 feeds, and licensed alt-data.</p>
+</main>
+
+<script>
+/* ════════════ DATA — fictional archetypes ════════════ */
+const COMPANIES = [
+{
+  sym:"MGC", name:"Meridian Grid Corp.", sector:"INFRASTRUCTURE SOFTWARE", px:412.18, chg:+1.4,
+  fin:{ // [prior year, current year], $M
+    rev:[8200,9700], recv:[820,940], cogs:[2050,2400], inv:[0,0],
+    ca:[9000,10800], ppe:[1200,1450], ta:[14000,16500], dep:[240,300],
+    sga:[2460,2850], cl:[2200,2500], tl:[4600,5200], ltd:[1400,1500],
+    re:[5200,6900], ebit:[2700,3300], ni:[2400,2900], cfo:[3300,4000],
+    mve:118000, shares:[290,288], grossDebt:[1800,1900], cash:[6200,7400], capex:520, fcf:3480
+  },
+  ins:{ net12m:-38, buys:3, sells:11, planPct:92, cluster:false, cfoBuy:true, pledged:0 },
+  gov:{ indep:82, dualClass:false, audTenure:6, nonAuditPct:8, payRatio:212, rpt:false, ceoChair:false },
+  val:{ evEbitda:28.4, sectorEvEbitda:24.0, fcfYield:2.9, impliedG:16.5, analystG:18.0 },
+  qnt:{ beta:1.12, vol90:24, si:1.1, dtc:0.8, mdd:-18 },
+  alt:{ jobs:[100,104,109,115,121,128], web:[100,106,111,118,124,131], guide:"+17% rev guided", divergence:false }
+},
+{
+  sym:"HLX", name:"Helios Basin Energy", sector:"OIL & GAS E&P", px:31.62, chg:-0.8,
+  fin:{
+    rev:[5400,5950], recv:[560,690], cogs:[3460,3900], inv:[410,520],
+    ca:[2600,2950], ppe:[6800,7300], ta:[11200,12400], dep:[820,840],
+    sga:[640,730], cl:[1900,2200], tl:[6900,7800], ltd:[4300,4900],
+    re:[1800,2050], ebit:[920,980], ni:[520,560], cfo:[610,480],
+    mve:6100, shares:[193,193], grossDebt:[4600,5200], cash:[700,620], capex:1450, fcf:-970
+  },
+  ins:{ net12m:-21.4, buys:1, sells:9, planPct:35, cluster:true, cfoBuy:false, pledged:0 },
+  gov:{ indep:64, dualClass:false, audTenure:14, nonAuditPct:22, payRatio:318, rpt:false, ceoChair:true },
+  val:{ evEbitda:5.9, sectorEvEbitda:6.4, fcfYield:-15.9, impliedG:3.0, analystG:6.0 },
+  qnt:{ beta:1.58, vol90:46, si:7.2, dtc:4.1, mdd:-41 },
+  alt:{ jobs:[100,97,95,96,92,90], web:[100,99,97,98,96,95], guide:"+9% production guided", divergence:true }
+},
+{
+  sym:"VRG", name:"Vertex Retail Group", sector:"SPECIALTY RETAIL", px:8.94, chg:-4.6,
+  fin:{
+    rev:[6400,7100], recv:[610,1060], cogs:[4480,5120], inv:[1500,2300],
+    ca:[3900,4700], ppe:[2600,2700], ta:[8200,9600], dep:[380,350],
+    sga:[1540,1620], cl:[2600,3100], tl:[6100,7600], ltd:[2900,3900],
+    re:[700,900], ebit:[380,310], ni:[210,240], cfo:[350,-120],
+    mve:2100, shares:[235,242], grossDebt:[3400,4400], cash:[380,290], capex:310, fcf:-430
+  },
+  ins:{ net12m:-64, buys:0, sells:17, planPct:18, cluster:true, cfoBuy:false, pledged:11 },
+  gov:{ indep:45, dualClass:true, audTenure:19, nonAuditPct:41, payRatio:540, rpt:true, ceoChair:true },
+  val:{ evEbitda:9.8, sectorEvEbitda:7.1, fcfYield:-20.4, impliedG:11.0, analystG:4.0 },
+  qnt:{ beta:1.91, vol90:68, si:23.4, dtc:9.6, mdd:-62 },
+  alt:{ jobs:[100,91,82,74,69,61], web:[100,96,88,83,79,72], guide:"+8% rev guided", divergence:true }
+}];
+
+/* ════════════ MODEL ENGINE ════════════ */
+const r2=x=>Math.round(x*100)/100, r1=x=>Math.round(x*10)/10;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+
+function beneish(f){
+  const [r0,r1y]=f.rev,[rc0,rc1]=f.recv,[c0,c1]=f.cogs,[ca0,ca1]=f.ca,
+        [p0,p1]=f.ppe,[ta0,ta1]=f.ta,[d0,d1]=f.dep,[s0,s1]=f.sga,[tl0,tl1]=f.tl;
+  const DSRI=(rc1/r1y)/(rc0/r0);
+  const GMI=((r0-c0)/r0)/((r1y-c1)/r1y);
+  const AQI=(1-(ca1+p1)/ta1)/(1-(ca0+p0)/ta0);
+  const SGI=r1y/r0;
+  const DEPI=(d0/(d0+p0))/(d1/(d1+p1));
+  const SGAI=(s1/r1y)/(s0/r0);
+  const LVGI=(tl1/ta1)/(tl0/ta0);
+  const TATA=(f.ni[1]-f.cfo[1])/ta1;
+  const M=-4.84+0.92*DSRI+0.528*GMI+0.404*AQI+0.892*SGI+0.115*DEPI-0.172*SGAI+4.679*TATA-0.327*LVGI;
+  return {M:r2(M),DSRI:r2(DSRI),TATA:r2(TATA),SGI:r2(SGI)};
+}
+function altman(f){
+  const wc=f.ca[1]-f.cl[1], ta=f.ta[1];
+  const Z=1.2*wc/ta+1.4*f.re[1]/ta+3.3*f.ebit[1]/ta+0.6*f.mve/f.tl[1]+1.0*f.rev[1]/ta;
+  return r2(Z);
+}
+function piotroski(f){
+  let s=0; const ta0=f.ta[0],ta1=f.ta[1];
+  if(f.ni[1]>0)s++;
+  if(f.cfo[1]>0)s++;
+  if(f.ni[1]/ta1>f.ni[0]/ta0)s++;
+  if(f.cfo[1]>f.ni[1])s++;
+  if(f.ltd[1]/ta1<=f.ltd[0]/ta0)s++;
+  if(f.ca[1]/f.cl[1]>=f.ca[0]/f.cl[0])s++;
+  if(f.shares[1]<=f.shares[0])s++;
+  if((f.rev[1]-f.cogs[1])/f.rev[1]>=(f.rev[0]-f.cogs[0])/f.rev[0])s++;
+  if(f.rev[1]/ta1>=f.rev[0]/ta0)s++;
+  return s;
+}
+const dso=(rc,rev)=>r1(rc/rev*365);
+function accrualRatio(f){return r2(((f.ni[1]-f.cfo[1])/f.ta[1])*100);}
+
+function buildLayers(c){
+  const f=c.fin, B=beneish(f), Z=altman(f), F=piotroski(f);
+  const dso0=dso(f.recv[0],f.rev[0]), dso1=dso(f.recv[1],f.rev[1]);
+  const accr=accrualRatio(f);
+  const invG=f.inv[0]?r1((f.inv[1]/f.inv[0]-1)*100):null;
+  const revG=r1((f.rev[1]/f.rev[0]-1)*100);
+  const cfoNi=r2(f.cfo[1]/Math.max(f.ni[1],1));
+  const ndEbitda=r2((f.grossDebt[1]-f.cash[1])/(f.ebit[1]+f.dep[1]));
+  const altSlope=r1(c.alt.jobs[5]-c.alt.jobs[0]);
+  const webSlope=r1(c.alt.web[5]-c.alt.web[0]);
+  const gapDCF=r1(c.val.impliedG-c.val.analystG);
+
+  // sub-scores 0–100 (higher = healthier)
+  const sForensic=clamp(Math.round(
+      (B.M<-2.22?40:B.M<-1.78?22:5)
+      +(accr<0?20:accr<3?12:3)
+      +(dso1-dso0<3?20:dso1-dso0<8?10:2)
+      +(invG===null||invG<=revG+5?20:invG<=revG+20?10:2)),0,100);
+  const sFinStmt=clamp(Math.round(F/9*55+(cfoNi>=1?30:cfoNi>0.7?18:cfoNi>0?8:0)+(revG>5?15:revG>0?8:0)),0,100);
+  const sInsider=clamp(Math.round(
+      (c.ins.buys>=c.ins.sells?40:c.ins.buys>0?18:5)
+      +(c.ins.planPct>=80?25:c.ins.planPct>=50?12:4)
+      +(c.ins.cluster?0:25)+(c.ins.pledged>0?0:10)),0,100);
+  const sGov=clamp(Math.round(c.gov.indep*0.45+(c.gov.dualClass?0:12)+(c.gov.audTenure<10?12:c.gov.audTenure<15?6:0)
+      +(c.gov.nonAuditPct<15?10:c.gov.nonAuditPct<30?5:0)+(c.gov.rpt?0:11)+(c.gov.ceoChair?0:10)),0,100);
+  const sVal=clamp(Math.round(50+(c.val.sectorEvEbitda-c.val.evEbitda)*4+(c.val.fcfYield>0?c.val.fcfYield*3:c.val.fcfYield*1.5)-Math.max(gapDCF,0)*3),0,100);
+  const sRisk=clamp(Math.round(100-(Z<1.81?38:Z<2.99?18:0)-clamp(c.qnt.vol90-20,0,40)-clamp(c.qnt.si*1.2,0,25)-clamp(ndEbitda*4,0,20)),0,100);
+  const sQuant=clamp(Math.round(100-clamp((c.qnt.beta-1)*30,0,30)-clamp(Math.abs(c.qnt.mdd)*0.7,0,45)-clamp(c.qnt.dtc*2.5,0,20)),0,100);
+  const sAlt=clamp(Math.round(50+altSlope*1.4+webSlope*0.8-(c.alt.divergence?20:0)),0,100);
+
+  const st=(g,a,v)=>v>=g?"g":v>=a?"a":"r"; // status helper
+
+  return [
+  {id:"forensic",ttl:"Forensic Accounting",wt:0.25,score:sForensic,metrics:[
+    {n:"Beneish M-Score",v:B.M,s:B.M<-2.22?"g":B.M<-1.78?"a":"r",
+     w:`Eight-ratio model trained to detect earnings manipulation. <em>Above −1.78 is the classic red zone</em> — the model flagged Enron before its collapse. Driven here by receivables growth (DSRI ${B.DSRI}) and accruals (TATA ${B.TATA}).`},
+    {n:"Sloan Accruals / Assets",v:accr+"%",s:accr<0?"g":accr<3?"a":"r",
+     w:`Gap between reported profit and actual cash, scaled by assets. <em>High accruals = paper earnings.</em> Firms in the top accrual decile historically underperform by ~10%/yr (Sloan, 1996).`},
+    {n:"DSO Trend (days)",v:dso0+" → "+dso1,s:dso1-dso0<3?"g":dso1-dso0<8?"a":"r",
+     w:`Days Sales Outstanding — how long customers take to pay. <em>A jump means revenue is being booked faster than cash arrives</em>: possible channel stuffing or loosened credit terms to hit targets.`},
+    invG===null?{n:"Inventory vs Revenue",v:"n/a (asset-light)",s:"g",w:`No physical inventory — one classic manipulation channel is structurally absent.`}
+    :{n:"Inventory vs Revenue Growth",v:`+${invG}% vs +${revG}%`,s:invG<=revG+5?"g":invG<=revG+20?"a":"r",
+     w:`Inventory growing far faster than sales means product is piling up. <em>It usually resolves through markdowns or write-offs</em> — both crush future margins. This is a signature Muddy Waters screen.`},
+  ]},
+  {id:"finstmt",ttl:"Financial Statements",wt:0.15,score:sFinStmt,metrics:[
+    {n:"Piotroski F-Score",v:F+" / 9",s:F>=7?"g":F>=4?"a":"r",
+     w:`Nine pass/fail tests of profitability, leverage and efficiency. <em>7–9 = fundamentally strengthening; 0–3 = deteriorating.</em> Low-F firms are the historical hunting ground for short sellers.`},
+    {n:"Cash Conversion (CFO ÷ Net Income)",v:cfoNi+"×",s:cfoNi>=1?"g":cfoNi>0.7?"a":"r",
+     w:`Every $1 of reported profit should eventually show up as cash. <em>Persistently below 1.0× means earnings quality is suspect</em> — profit exists in journal entries, not the bank account.`},
+    {n:"Revenue Growth (YoY)",v:"+"+revG+"%",s:revG>8?"g":revG>0?"a":"r",
+     w:`Growth is the context for everything else: red flags during <em>decelerating</em> growth are far more dangerous, because management has the strongest incentive to stretch numbers exactly then.`},
+    {n:"Free Cash Flow",v:(f.fcf>=0?"+$":"−$")+Math.abs(f.fcf)+"M",s:f.fcf>0?"g":f.fcf>-300?"a":"r",
+     w:`Cash left after capex — the money that actually funds buybacks, dividends and debt paydown. <em>Negative FCF + rising debt is the combination that forces dilutive equity raises.</em>`},
+  ]},
+  {id:"insider",ttl:"Insider Trading",wt:0.15,score:sInsider,metrics:[
+    {n:"Net Insider Flow (12m)",v:(c.ins.net12m>=0?"+$":"−$")+Math.abs(c.ins.net12m)+"M",s:c.ins.net12m>-10?"g":c.ins.net12m>-40?"a":"r",
+     w:`Executives sell for many reasons but <em>buy for only one</em>. Net dollar flow weights conviction: large open-market buys are the single strongest insider signal in the academic literature.`},
+    {n:"Cluster Selling Detected",v:c.ins.cluster?"YES":"NO",s:c.ins.cluster?"r":"g",
+     w:`Three or more officers selling within a 30-day window. <em>One insider selling is noise; the whole C-suite selling together is information.</em> Cluster sells precede negative news at well above base rates.`},
+    {n:"% Sales Under 10b5-1 Plans",v:c.ins.planPct+"%",s:c.ins.planPct>=80?"g":c.ins.planPct>=50?"a":"r",
+     w:`Pre-scheduled plan sales are mechanical; <em>discretionary (non-plan) sales are timed choices</em>. A low plan share means executives are actively choosing this moment to exit.`},
+    {n:"Pledged Shares",v:c.ins.pledged+"% of insider stake",s:c.ins.pledged===0?"g":c.ins.pledged<5?"a":"r",
+     w:`Shares pledged as loan collateral can trigger <em>forced margin sales into a falling stock</em> — a reflexive doom loop. A recurring feature in major collapses (e.g., pledged-founder blowups).`},
+  ]},
+  {id:"gov",ttl:"Corporate Governance",wt:0.10,score:sGov,metrics:[
+    {n:"Board Independence",v:c.gov.indep+"%",s:c.gov.indep>=75?"g":c.gov.indep>=55?"a":"r",
+     w:`Independent directors are the only people legally positioned to fire the CEO or challenge the numbers. <em>Below ~55%, oversight is structurally captured.</em>`},
+    {n:"Auditor Tenure / Non-Audit Fees",v:c.gov.audTenure+" yrs / "+c.gov.nonAuditPct+"%",s:c.gov.audTenure<10&&c.gov.nonAuditPct<15?"g":c.gov.audTenure<15&&c.gov.nonAuditPct<30?"a":"r",
+     w:`Long tenure plus high consulting fees = an auditor economically dependent on the client. <em>Arthur Andersen earned more from Enron's consulting than its audit.</em>`},
+    {n:"Dual-Class / CEO=Chair",v:(c.gov.dualClass?"DUAL":"SINGLE")+" / "+(c.gov.ceoChair?"COMBINED":"SPLIT"),s:!c.gov.dualClass&&!c.gov.ceoChair?"g":(c.gov.dualClass&&c.gov.ceoChair?"r":"a"),
+     w:`Dual-class shares + a CEO who chairs their own board means <em>shareholders cannot vote the problem away</em>. Accountability becomes voluntary.`},
+    {n:"Related-Party Transactions",v:c.gov.rpt?"DISCLOSED — MATERIAL":"NONE MATERIAL",s:c.gov.rpt?"r":"g",
+     w:`Deals with entities the insiders also own are the <em>primary tunnel for extracting value from minority shareholders</em> — the core mechanism in most frauds Hindenburg-style reports document.`},
+  ]},
+  {id:"val",ttl:"Valuation",wt:0.10,score:sVal,metrics:[
+    {n:"EV/EBITDA vs Sector",v:c.val.evEbitda+"× vs "+c.val.sectorEvEbitda+"×",s:c.val.evEbitda<=c.val.sectorEvEbitda?"g":c.val.evEbitda<=c.val.sectorEvEbitda*1.3?"a":"r",
+     w:`Capital-structure-neutral multiple vs peers. <em>A premium multiple on deteriorating fundamentals is the worst combination</em>: you pay up for quality that isn't there.`},
+    {n:"FCF Yield",v:c.val.fcfYield+"%",s:c.val.fcfYield>4?"g":c.val.fcfYield>0?"a":"r",
+     w:`Free cash flow per dollar of enterprise value — the valuation metric hardest to fake. <em>Negative yield means the business consumes capital at this price.</em>`},
+    {n:"Reverse-DCF Implied Growth",v:c.val.impliedG+"% vs "+c.val.analystG+"% est.",s:gapDCF<=0?"g":gapDCF<=4?"a":"r",
+     w:`Instead of guessing fair value, we ask: <em>what growth does today's price already assume?</em> If the price implies more growth than even bullish analysts forecast, the downside is asymmetric.`},
+  ]},
+  {id:"risk",ttl:"Solvency & Risk",wt:0.10,score:sRisk,metrics:[
+    {n:"Altman Z-Score",v:Z,s:Z>2.99?"g":Z>1.81?"a":"r",
+     w:`Five-ratio bankruptcy predictor. <em>Below 1.81 = distress zone</em> (historical 2-yr failure odds materially elevated); 1.81–2.99 = grey zone; above 2.99 = safe.`},
+    {n:"Net Debt / EBITDA",v:ndEbitda+"×",s:ndEbitda<2?"g":ndEbitda<3.5?"a":"r",
+     w:`Years of cash earnings needed to repay net debt. <em>Above ~3.5× leaves no buffer</em> for a downturn, covenant pressure, or a refinancing window slamming shut.`},
+    {n:"Short Interest / Days-to-Cover",v:c.qnt.si+"% / "+c.qnt.dtc+"d",s:c.qnt.si<4?"g":c.qnt.si<12?"a":"r",
+     w:`How much of the float is sold short. <em>High short interest means sophisticated capital is betting on failure</em> — and crowded shorts also create violent squeeze risk in both directions.`},
+  ]},
+  {id:"quant",ttl:"Quantitative Signals",wt:0.08,score:sQuant,metrics:[
+    {n:"Beta / 90-Day Volatility",v:c.qnt.beta+" / "+c.qnt.vol90+"%",s:c.qnt.vol90<28?"g":c.qnt.vol90<45?"a":"r",
+     w:`Volatility is the market's real-time disagreement meter. <em>Rising vol with falling price means the market is repricing the story, not the quarter.</em>`},
+    {n:"Max Drawdown (24m)",v:c.qnt.mdd+"%",s:c.qnt.mdd>-25?"g":c.qnt.mdd>-45?"a":"r",
+     w:`The worst peak-to-trough loss a holder actually experienced. <em>A −60% drawdown needs +150% just to break even</em> — path matters as much as endpoint.`},
+    {n:"Momentum Regime",v:c.qnt.mdd>-25?"UPTREND":c.qnt.mdd>-45?"BROKEN TREND":"CAPITULATION",s:c.qnt.mdd>-25?"g":c.qnt.mdd>-45?"a":"r",
+     w:`Trend classification from price structure. Quant funds avoid fighting regime: <em>cheap stocks in capitulation regimes get cheaper</em> far more often than they mean-revert quickly.`},
+  ]},
+  {id:"alt",ttl:"Alternative Data",wt:0.07,score:sAlt,metrics:[
+    {n:"Job Postings Index (6m)",v:(altSlope>=0?"+":"")+altSlope+" pts",s:altSlope>=0?"g":altSlope>-15?"a":"r",spark:c.alt.jobs,
+     w:`Hiring is a forward commitment of cash — <em>companies cut requisitions before they cut guidance</em>. A collapsing postings index typically leads revenue misses by 1–2 quarters.`},
+    {n:"Web Traffic Index (6m)",v:(webSlope>=0?"+":"")+webSlope+" pts",s:webSlope>=0?"g":webSlope>-12?"a":"r",spark:c.alt.web,
+     w:`Demand-side telemetry that management cannot massage. <em>Traffic decaying while revenue "grows" implies the growth is price, channel-stuffing, or accounting</em> — not customers.`},
+    {n:"Alt-Data vs Guidance",v:c.alt.divergence?"DIVERGENT — "+c.alt.guide:"CONFIRMS — "+c.alt.guide,s:c.alt.divergence?"r":"g",
+     w:`The single question alt-data answers: <em>does the real world agree with the press release?</em> Divergence is where short-sellers' theses are born.`},
+  ]}];
+}
+
+function composite(layers){
+  let s=0; layers.forEach(l=>s+=l.score*l.wt);
+  return Math.round(s);
+}
+function verdictFor(score){
+  if(score>=80)return{band:"INSTITUTIONAL GRADE",col:"var(--teal)",head:"Clean across all eight layers."};
+  if(score>=65)return{band:"STABLE / MONITOR",col:"var(--teal)",head:"Fundamentally sound, isolated watch items."};
+  if(score>=45)return{band:"ELEVATED RISK",col:"var(--amber)",head:"Multiple stress signals — position sizing matters."};
+  if(score>=25)return{band:"HIGH RISK",col:"var(--red)",head:"Stressed balance sheet, thin margin for error."};
+  return{band:"SEVERE — FORENSIC ALERT",col:"var(--red)",head:"Pattern consistent with pre-blowup case studies."};
+}
+function plainEnglish(c,layers,score){
+  const by=Object.fromEntries(layers.map(l=>[l.id,l]));
+  const p=[];
+  const worst=[...layers].sort((a,b)=>a.score-b.score).slice(0,2).map(l=>l.ttl.toLowerCase()).join(" and ");
+  const best=[...layers].sort((a,b)=>b.score-a.score)[0].ttl.toLowerCase();
+  if(score>=65){
+    p.push(`<strong>${c.sym}</strong> clears the screens an institutional desk would run before sizing a position. Earnings convert to cash, the manipulation models (Beneish, accruals) sit comfortably in safe territory, and insider behavior is unremarkable.`);
+    p.push(`The residual debate is <strong>${100-by.val.score>40?"valuation — you are paying a premium multiple, so the risk here is price, not fraud":"minor and confined to "+worst}</strong>.`);
+  }else if(score>=25){
+    p.push(`<strong>${c.sym}</strong> is not a fraud screen hit — it is a <strong>balance-sheet stress case</strong>. The weakest layers are ${worst}; the strongest is ${best}. The accounting broadly holds up, but negative free cash flow, leverage and clustered insider selling say management has less room for error than the equity price assumes.`);
+    p.push(`Translation: this can work, but the path is leveraged to one or two external variables. Size it like an option, not a core holding.`);
+  }else{
+    p.push(`<strong>${c.sym}</strong> trips screens across <strong>independent</strong> layers — accounting, cash flow, insiders, governance and real-world demand all point the same direction. One red flag is noise; correlated red flags are a thesis.`);
+    p.push(`Receivables and inventory are growing far faster than sales while operating cash flow has gone negative — the classic signature of <strong>stretched revenue recognition</strong>. Insiders are exiting in clusters outside trading plans, the board cannot realistically intervene, and hiring/traffic data contradicts guidance. This is the pattern forensic shops publish reports on.`);
+  }
+  return p.map(t=>`<span style="display:block;margin-bottom:8px">${t}</span>`).join("");
+}
+function topFlags(layers){
+  const firsts=[],rest=[];
+  layers.forEach(l=>{
+    const reds=l.metrics.filter(m=>m.s==="r").map(m=>({t:l.ttl.toUpperCase()+": "+m.n.toUpperCase(),c:"r"}));
+    if(reds.length){firsts.push(reds[0]);rest.push(...reds.slice(1));}
+  });
+  const out=[...firsts,...rest];
+  if(!out.length)out.push({t:"NO RED FLAGS DETECTED — ALL LAYERS PASS",c:"g"});
+  return out.slice(0,6);
+}
+
+/* ════════════ RENDER ════════════ */
+const $=id=>document.getElementById(id);
+let selIdx=null, scanning=false;
+
+function renderDeck(){
+  const d=$("deck"); d.innerHTML="";
+  COMPANIES.forEach((c,i)=>{
+    const b=document.createElement("button");
+    b.className="tick"+(i===selIdx?" sel":"");
+    b.innerHTML=`<div class="sym">${c.sym} <span style="color:${c.chg>=0?'var(--teal)':'var(--red)'};font-size:13px">${c.chg>=0?"▲":"▼"} ${Math.abs(c.chg)}%</span></div>
+      <div class="nm">${c.name} · $${c.px}</div><div class="sec">${c.sector}</div>`;
+    b.onclick=()=>{if(scanning)return;selIdx=i;renderDeck();};
+    d.appendChild(b);
+  });
+  const run=document.createElement("button");
+  run.className="runbtn"; run.id="run";
+  run.innerHTML=`▶ RUN DEEP SCAN`;
+  run.onclick=startScan;
+  d.appendChild(run);
+}
+renderDeck();
+
+setInterval(()=>{const n=new Date();$("clock").textContent=n.toUTCString().slice(17,25);},1000);
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function startScan(){
+  if(scanning)return;
+  if(selIdx===null){selIdx=2;renderDeck();}
+  scanning=true; $("run").disabled=true;
+  const c=COMPANIES[selIdx], layers=buildLayers(c), score=composite(layers);
+  ["verdict","layers","snapwrap"].forEach(id=>$(id).classList.remove("on"));
+  const con=$("console"); con.classList.add("on"); con.classList.remove("done"); con.innerHTML="";
+
+  const log=async(html,d=130)=>{const s=document.createElement("span");s.className="cl";s.innerHTML=html;con.appendChild(s);con.scrollTop=con.scrollHeight;await sleep(d);};
+  const tag=l=>{const worst=l.metrics.some(m=>m.s==="r")?'<span class="fail">FLAG</span>':l.metrics.some(m=>m.s==="a")?'<span class="warn">WATCH</span>':'<span class="ok">PASS</span>';return worst;};
+
+  await log(`<span class="sys">AEGIS v2.4 // initiating 8-layer deep scan → <b>${c.sym}</b> (${c.name})</span>`,300);
+  await log(`<span class="sys">pulling 10-K / 10-Q ledgers · Form 4 feed · board records · alt-data streams…</span>`,500);
+  for(const l of layers){
+    const key=l.metrics[0];
+    await log(`[${l.ttl.toUpperCase().padEnd(22,"·")}] ${key.n}: <b>${key.v}</b> … ${tag(l)} <span class="sys">(layer ${l.score}/100)</span>`,330);
+  }
+  await log(`<span class="sys">cross-correlating layers · weighting · compiling verdict…</span>`,650);
+  await log(`AEGIS INTEGRITY SCORE: <b style="color:${verdictFor(score).col}">${score}/100 — ${verdictFor(score).band}</b>`,200);
+  con.classList.add("done");
+
+  renderVerdict(c,layers,score);
+  renderLayers(layers);
+  renderSnap(c,layers,score);
+  scanning=false; $("run").disabled=false;
+  $("verdict").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function renderVerdict(c,layers,score){
+  const v=verdictFor(score);
+  $("verdict").classList.add("on");
+  $("vSub").textContent=`${c.sym} · ${c.name.toUpperCase()} · ${c.sector} · SCAN ${new Date().toISOString().slice(0,10)}`;
+  $("vHead").textContent=v.head;
+  $("vText").innerHTML=plainEnglish(c,layers,score);
+  const fb=$("vBand"); fb.textContent=v.band; fb.style.color=v.col; fb.style.borderColor=v.col;
+  $("vFlags").innerHTML=topFlags(layers).map(f=>`<span class="flag ${f.c}">${f.t}</span>`).join("");
+  // dial: arc length 395.8 (=270deg of r84 circle)
+  const fill=$("dialFill"); fill.style.stroke=v.col;
+  fill.style.transition="none"; fill.style.strokeDashoffset=395.8; void fill.getBoundingClientRect();
+  fill.style.transition="";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{fill.style.strokeDashoffset=395.8*(1-score/100);}));
+  // count-up
+  const num=$("dialNum"); const t0=performance.now();
+  (function step(t){const k=Math.min((t-t0)/1500,1);num.textContent=Math.round(score*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(step);})(t0);
+}
+
+function sparkSVG(arr,color){
+  const w=180,h=34,min=Math.min(...arr),max=Math.max(...arr),rg=max-min||1;
+  const pts=arr.map((v,i)=>`${(i/(arr.length-1)*w).toFixed(1)},${(h-3-(v-min)/rg*(h-6)).toFixed(1)}`).join(" ");
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.6"/></svg>`;
+}
+
+function renderLayers(layers){
+  const grid=$("layers"); grid.classList.add("on"); grid.innerHTML="";
+  layers.forEach((l,i)=>{
+    const col=l.score>=70?"var(--teal)":l.score>=45?"var(--amber)":"var(--red)";
+    const card=document.createElement("div"); card.className="card";
+    card.innerHTML=`
+      <div class="card-h"><div><div class="ttl">${l.ttl}</div><div class="wt">WEIGHT ${(l.wt*100).toFixed(0)}% OF COMPOSITE</div></div>
+        <div class="lscore" style="color:${col}">${l.score}<span style="color:var(--ink-dim);font-size:11px">/100</span></div></div>
+      <div class="lbar"><i style="background:${col}"></i></div>
+      ${l.metrics.map((m,j)=>`
+        <div class="metric" id="mx-${l.id}-${j}">
+          <button class="m-row" onclick="const p=this.parentElement;p.classList.toggle('open');this.setAttribute('aria-expanded',p.classList.contains('open'))" aria-expanded="false">
+            <span class="m-dot ${m.s}"></span><span class="m-name">${m.n}</span>
+            <span class="m-val" style="color:${m.s==='r'?'var(--red)':m.s==='a'?'var(--amber)':'var(--ink)'}">${m.v}</span>
+            <span class="m-car">▶</span>
+          </button>
+          <div class="m-why"><strong style="color:var(--ink-mid)">WHY IT MATTERS — </strong>${m.w}</div>
+          ${m.spark?sparkSVG(m.spark,m.s==='r'?'#FF4D4D':m.s==='a'?'#F5A623':'#2FD6A3'):""}
+        </div>`).join("")}`;
+    grid.appendChild(card);
+    setTimeout(()=>{card.classList.add("in");card.querySelector(".lbar i").style.width=l.score+"%";},120*i+80);
+  });
+}
+
+function renderSnap(c,layers,score){
+  const v=verdictFor(score);
+  const reds=topFlags(layers);
+  $("snapwrap").classList.add("on");
+  $("snap").innerHTML=`
+    <div class="s-top"><span>AEGIS // FORENSIC EQUITY TERMINAL</span><span>${new Date().toISOString().slice(0,10)} · DEMO</span></div>
+    <div class="s-grid">
+      <div><div class="s-sym">${c.sym}</div><div class="s-nm">${c.name} · ${c.sector}</div>
+        <span class="v-band" style="color:${v.col};border-color:${v.col};margin-top:12px">${v.band}</span></div>
+      <div style="text-align:right"><div class="s-score" style="color:${v.col}">${score}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--ink-dim);letter-spacing:.18em">INTEGRITY SCORE / 100</div></div>
+    </div>
+    <div class="s-flags">${reds.slice(0,4).map(f=>`<span>${f.t}</span>`).join("")}</div>
+    <div class="s-foot"><span>8 LAYERS · 28 METRICS · BENEISH / ALTMAN / PIOTROSKI / SLOAN</span><span>NOT INVESTMENT ADVICE</span></div>`;
+}
+</script>
+</body>
+</html>
