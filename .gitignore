@@ -1,0 +1,40 @@
+# Virtual environment
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment / secrets
+.env
+
+# Generated outputs (re-created on each run)
+analysis_output.xlsx
+watchlist.xlsx
+
+# Node modules
+node_modules/
+
+# Graphify cache (local only, not needed in repo)
+.graphify_*.json
+.graphify_*.txt
+.graphify_python
+graphify-out/cache/
+graphify-out/converted/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code local settings
+.claude/

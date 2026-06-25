@@ -1,0 +1,132 @@
+{
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\.claude\\settings.local.json": {
+    "mtime": 1781636396.6294763,
+    "ast_hash": "2633765e262d97804c8592a9ef8fa78b",
+    "semantic_hash": "2633765e262d97804c8592a9ef8fa78b"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\.graphify_detect.json": {
+    "mtime": 1781618550.4739463,
+    "ast_hash": "7eea1f4a4ef0c88c708aa47bfe4d3b61",
+    "semantic_hash": "7eea1f4a4ef0c88c708aa47bfe4d3b61"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\batch_test.py": {
+    "mtime": 1781622625.814791,
+    "ast_hash": "30df489d0ee8562ee8d4d5aa5a912138",
+    "semantic_hash": "30df489d0ee8562ee8d4d5aa5a912138"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\forward_and_montecarlo.py": {
+    "mtime": 1781616276.100771,
+    "ast_hash": "eb08b3215514054031e33cb8d0b11b63",
+    "semantic_hash": "eb08b3215514054031e33cb8d0b11b63"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\aegis-terminal.html": {
+    "mtime": 1781216251.6003993,
+    "ast_hash": "00411ab3a18ed53d57df42c99d2575f5",
+    "semantic_hash": "00411ab3a18ed53d57df42c99d2575f5"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\Quant Finance Master Prompt Guide Deepkumar Khinchi-merged-.pdf": {
+    "mtime": 1781188133.9291484,
+    "ast_hash": "fc772dfab38ea5befa074613b4abe224",
+    "semantic_hash": "fc772dfab38ea5befa074613b4abe224"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\.claude\\settings.json": {
+    "mtime": 1781636088.5871527,
+    "ast_hash": "2fd089f5cc3b4f6bcd89a258664ecdec",
+    "semantic_hash": "2fd089f5cc3b4f6bcd89a258664ecdec"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\daily_analysis.py": {
+    "mtime": 1782383613.019583,
+    "ast_hash": "76495c0c71c51936e749e50bcab1401a",
+    "semantic_hash": "76495c0c71c51936e749e50bcab1401a"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\engine\\__init__.py": {
+    "mtime": 1782383329.920483,
+    "ast_hash": "f8c5ab5a1887cb00735067ef09227d11",
+    "semantic_hash": "f8c5ab5a1887cb00735067ef09227d11"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\engine\\backtest.py": {
+    "mtime": 1782383396.1802874,
+    "ast_hash": "b3c354934895d98ac2b8921deac393e4",
+    "semantic_hash": "b3c354934895d98ac2b8921deac393e4"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\engine\\data.py": {
+    "mtime": 1782383347.6178281,
+    "ast_hash": "b95c281468db04209a416b5df676c962",
+    "semantic_hash": "b95c281468db04209a416b5df676c962"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\engine\\indicators.py": {
+    "mtime": 1782383498.196159,
+    "ast_hash": "a8fe015c58dffce6fe393669fb3176c6",
+    "semantic_hash": "a8fe015c58dffce6fe393669fb3176c6"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\engine\\recommendation.py": {
+    "mtime": 1782383421.4219923,
+    "ast_hash": "55508afa4fd3b5b804fc777818b518d8",
+    "semantic_hash": "55508afa4fd3b5b804fc777818b518d8"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\engine\\strategies.py": {
+    "mtime": 1782383380.2517433,
+    "ast_hash": "49f759b917991a7e7dc809e32da1ff5f",
+    "semantic_hash": "49f759b917991a7e7dc809e32da1ff5f"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\trading-mcp-server\\.claude\\settings.local.json": {
+    "mtime": 1782384993.2555993,
+    "ast_hash": "f89e5ee2521b1714f396a001dd63acd0",
+    "semantic_hash": "f89e5ee2521b1714f396a001dd63acd0"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\trading-mcp-server\\package.json": {
+    "mtime": 1781630603.2236838,
+    "ast_hash": "a96db7654bb16526fee47e4bb4504e78",
+    "semantic_hash": "a96db7654bb16526fee47e4bb4504e78"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\trading-mcp-server\\run_scan.mjs": {
+    "mtime": 1782217006.0672379,
+    "ast_hash": "3518465dbcf19cc209824efa9c3ef0cb",
+    "semantic_hash": "3518465dbcf19cc209824efa9c3ef0cb"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\trading-mcp-server\\src\\alerts.js": {
+    "mtime": 1781630299.620021,
+    "ast_hash": "03219d3c41bc1d7bbadf5b2ca6ab6ed1",
+    "semantic_hash": "03219d3c41bc1d7bbadf5b2ca6ab6ed1"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\trading-mcp-server\\src\\index.js": {
+    "mtime": 1782216517.5823252,
+    "ast_hash": "e429d68a8a8ef4d7b22cf667cd4d7d13",
+    "semantic_hash": "e429d68a8a8ef4d7b22cf667cd4d7d13"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\trading-mcp-server\\src\\market-data.js": {
+    "mtime": 1781632148.2398987,
+    "ast_hash": "197931e722f19b7e3e3bcc362b6c88bd",
+    "semantic_hash": "197931e722f19b7e3e3bcc362b6c88bd"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\trading-mcp-server\\src\\strategies.js": {
+    "mtime": 1782216488.8092973,
+    "ast_hash": "b8d8532ff3930acf67accc7a0a293971",
+    "semantic_hash": "b8d8532ff3930acf67accc7a0a293971"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\README.md": {
+    "mtime": 1782384013.3342986,
+    "ast_hash": "a76b275caf62076e4bc5234519f54c7e",
+    "semantic_hash": "a76b275caf62076e4bc5234519f54c7e"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\graphify-out\\converted\\analysis_output_d1d03beb.md": {
+    "mtime": 1782384993.8925855,
+    "ast_hash": "d912b6735ffa6c5c086ac44db0264627",
+    "semantic_hash": "d912b6735ffa6c5c086ac44db0264627"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\graphify-out\\converted\\watchlist_dc0f3da0.md": {
+    "mtime": 1782384994.0282803,
+    "ast_hash": "f13f95f708fcdf2fda7e32c9e584aea0",
+    "semantic_hash": "f13f95f708fcdf2fda7e32c9e584aea0"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\trading-mcp-server\\SCAN_GUIDE.md": {
+    "mtime": 1782216546.8173268,
+    "ast_hash": "91c9d0b05337976f5efd94e1cff8e773",
+    "semantic_hash": "91c9d0b05337976f5efd94e1cff8e773"
+  },
+  "C:\\Users\\shreyansh\\OneDrive\\Desktop\\warwick_code\\material\\quant_models\\trading-mcp-server\\USAGE.md": {
+    "mtime": 1781634125.9303577,
+    "ast_hash": "9b225fd1b5e0535e7a4f52fd9d312734",
+    "semantic_hash": "9b225fd1b5e0535e7a4f52fd9d312734"
+  }
+}
